@@ -1,5 +1,5 @@
 % ME5405: Computer Vision Project
-
+% THis code should be rrfoirjiss
 clc;clear;close all;
 
 %% Setting up the image matrix
