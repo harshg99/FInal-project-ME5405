@@ -38,14 +38,11 @@ for(k=1:254)
     %eta=sig_b/sig_w;
     eta=sig_b;
     if(eta>maxerror)
-        thresh=k;
+        thresh=;
         maxerror=eta;
-    elseif(abs(eta-maxerror)<=0.01)
-            thresh=[thresh,k];    
     end
 end
-    %thresh=sum(thresh)/length(thresh);
-    thresh=max(thresh);
+    thresh=sum(thresh)/length(thresh);
     t_image = zeros(size(imagex,1),size(imagex,2));
     t_image = (imagex > thresh);
     return

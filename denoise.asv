@@ -55,7 +55,7 @@ switch(ctype)
         %varargin={'var'','n''}
         %var is cutoff frequencny
         %n is exponenent for Butterworth Low Pass
-        filter = 1./(1+((dist/varargin{1}).^(2*varargin{2})));
+        filter = 1./((1+((dist/varargin{1}).^(2*varargin{2}));
     case 'BRF'
     case 'BPF'
 end
