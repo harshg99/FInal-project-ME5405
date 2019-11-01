@@ -2,8 +2,9 @@ function [Labels] = CompLabel(imagex,nhood,back_ground)
 
 LL = size(imagex,1);
 MM = size(imagex,2);
-Labels = zeros(LL,MM);
-
+image_objects=zeros(
+Labels = [];
+num=0;
 % First iteration
 for ii = 2:LL-1
     for jj = 2:MM-1
