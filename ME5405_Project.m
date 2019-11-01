@@ -1,5 +1,5 @@
 % ME5405: Computer Vision Project
-
+% Changes
 clc;clear;close all;
 
 %% Setting up the image matrix
