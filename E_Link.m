@@ -1,6 +1,15 @@
 function [Label] = E_Link(nhood,ang_thold,mag_thold,Edges)
-% Edge linking of the edges based on a predetermined neighbourhood, angle
-% and magnitude threshold
+% Edge linking of the edges based on a predetermined neighbourhood, angle and magnitude threshold
+% Currently not in working condition, but determines edges and labels based on closeness of gradients and angles
+
+% INPUT
+% nhood: 4 or 8 connectivity
+% ang_thold: Threshold to compare angles
+% mag_thold: Threshold to compare magnitudes
+% Edges: Edge array (2D)
+
+% OUTPUT
+% Label: 2D array of edge labels.
 
 
 % Sobel operator

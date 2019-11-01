@@ -1,7 +1,12 @@
 function [Cropped] = Crops(imagex)
 
+% Returns a cropped version of imagex by removing all the background elements
+% Imagex can be grayscale/binary 2D
+% Cropped is of the same image type as Imagex (but lesser dimensions)
+
+
 % To remove the 'background'
-cond = (imagex ~= mode(imagex(:)));
+cond = (imagex ~= mode(imagex(:))); % Background defined as the mode of the pixel intensity distribution
 iiarray = zeros(size(imagex,1));
 jjarray = zeros(size(imagex,2));
 
