@@ -22,9 +22,9 @@ for ii = 2:LL-1
 
                     if (~isempty(M_vect))
                         l1 = min(M_vect);
-                        for pp = 1:length(M_vect)
-                            Labels(Labels == M_vect(pp)) = l1;
-                        end
+                         for pp = 1:length(M_vect)
+                             Labels(Labels == M_vect(pp)) = l1;
+                         end
                     end
 
                 case 8
@@ -33,14 +33,16 @@ for ii = 2:LL-1
 
                     if (~isempty(M_vect))
                         l1 = min(M_vect);
-                        for pp = 1:length(M_vect)
-                            Labels(Labels == M_vect(pp)) = l1;
-                        end
+                         for pp = 1:length(M_vect)
+                             Labels(Labels == M_vect(pp)) = l1;
+                         end
+                                         
                     end
             end
         end
     end
 end
+
 
 % Second iteration
 % for ii = LL-1:-1:2

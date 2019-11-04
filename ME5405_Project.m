@@ -1,5 +1,5 @@
 % ME5405: Computer Vision Project
-% THis code should be rrfoirjiss
+
 clc;clear;close all;
 
 %% Setting up the image matrix
@@ -59,7 +59,7 @@ chip(:,:,1) = abs(denoise(chip(:,:,1),'Gaussian'));
 chip(:,:,2) = abs(denoise(chip(:,:,2),'Gaussian'));
 chip(:,:,3) = abs(denoise(chip(:,:,3),'Gaussian'));
 
-% Median filtering process
+% % Median filtering process
 % chip(:,:,1) = median_filter(chip(:,:,1),8);
 % chip(:,:,2) = median_filter(chip(:,:,2),8);
 % chip(:,:,3) = median_filter(chip(:,:,3),8);
@@ -101,21 +101,52 @@ back_chip = mode(t_chip_2(:));
 
 
 
-%% Edge detection for grayscale images
+%% Edge detection for thresholded images
 
-t_chip_2_star = t_chip_2;
-charac_star = charac;
-num_trials = 1;
-for ii = 1:num_trials
-    [Edges_chip,Xderiv_chip,Yderiv_chip] = EdgeDet(t_chip_2_star,1,1); % Too much noise with graylevel
-    [Edges_charac,Xderiv_charac,Yderiv_charac] = EdgeDet(charac_star,33,1);
+t_chip_2_star = t_chip_2; %Thresholded chip
+t_charac_star = t_charac; %Thresholded characters
+
+num_trials = 1; % In the even of executing multiple edge detection iterations, keep num_trials > 1
+
+for ii = 1:num_trials % Loop controlling no. of iterations of edge detection
+    [Edges_chip,Xderiv_chip,Yderiv_chip] = EdgeDet(t_chip_2_star,1,1); % Too much noise with graylevel image, so use the thresholded one
+    [Edges_charac,Xderiv_charac,Yderiv_charac] = EdgeDet(t_charac_star,1,1);
     t_chip_2_star = Edges_chip;
-    charac_star = Edges_charac;
+    t_charac_star = Edges_charac;
+end
+
+%% Rotation of segmented images
+
+Rot_charac = cell(1,length(Segment_charac));
+Rot_chip = cell(1,length(Segment_chip));
+angle = 35; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
+
+for kk = 1:length(Segment_charac)
+    Rot_charac{1,kk} = rotate(Segment_charac{1,kk},angle,"Bilinear");
+end
+
+for kk = 1:length(Segment_chip)
+    Rot_chip{1,kk} = rotate(Segment_chip{1,kk},angle,"Bilinear");
+end
+
+%% Skeletonisation of images (~ one pixel thickness version of the images)
+
+for kk = 1:length(Rot_charac)
+    t_Rot_charac = threshold(Rot_charac{1,kk},16);
+    Skele_Rot_charac{1,kk} = Skeletonise(t_Rot_charac,20,1);
+%    Skele_Rot_charac{1,kk} = cast(Skele_Rot_charac,"double").*Rot_charac{1,kk}; % To obtain gray scale version
+end
+
+for kk = 1:length(Rot_chip)
+    t_Rot_chip = threshold(Rot_chip{1,kk},120);
+    Skele_Rot_chip{1,kk} = Skeletonise(t_Rot_chip,20,0);
+%    Skele_Rot_chip{1,kk} = cast(Skele_Rot_chip,"double").*Rot_chip{1,kk}; % To obtain gray scale version
 end
 
 
 %% Plots
 
+%% Thresholded images
 figure()
 colormap(gray(2));
 image(t_charac);
@@ -131,6 +162,8 @@ colormap(gray(2));
 image(t_chip_2);
 title(["Thresholded chip: thresholding applied to grayscale"]);
 
+%% Segmented images
+
 for kk = 1:length(Segment_charac)
     figure()
     colormap(gray(32));
@@ -145,6 +178,8 @@ for kk = 1:length(Segment_chip)
     title(["Segment chip"]);
 end
 
+%% Edge detection
+
 figure()
 colormap(gray(32))
 image(Edges_charac);
@@ -155,17 +190,38 @@ colormap(gray(255))
 image(Edges_chip);
 title(["Edges of the chip"]);
 
+%% Rotated segments
+for kk = 1:length(Rot_charac)
+    figure()
+    colormap(gray(32));
+    image(Rot_charac{1,kk});
+    title(["Segment character: Rotated"]);
+end
 
+for kk = 1:length(Rot_chip)
+    figure()
+    colormap(gray(255));
+    image(Rot_chip{1,kk});
+    title(["Segment chip: Rotated"]);
+end
 
+%% Skeletonised + Rotated images
 
+for kk = 1:length(Skele_Rot_charac)
+    figure()
+    colormap(gray(2));
+    image(Skele_Rot_charac{1,kk});
+    title(["Segment character (Skeletonised)"]);
+end
 
+for kk = 1:length(Skele_Rot_chip)
+    figure()
+    colormap(gray(2));
+    image(Skele_Rot_chip{1,kk});
+    title(["Segment chip (Skeletonised)"]);
+end
 
-
-
-
-% Image segmentation
-% Rotate characters of the image by -90 and 35
-% Edge detection of characters
-% Skeletonisation of characters
+%%
+% To do:
 % Scale and display characters in a given sequence
 
