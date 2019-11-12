@@ -12,7 +12,6 @@ fileID = fopen('charact1.txt','r');
 charac = fscanf(fileID,'%s',[64,64]);
 charac = charac.';
 
-%charac_int = str2num(charac_txt)
 check = charac > '9';
 notcheck = ~check;
 charac = charac - 55.*check - 48.*notcheck;
