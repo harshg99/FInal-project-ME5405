@@ -29,7 +29,7 @@ for ii = 2:L-1
                     imagex(ii,jj-1),imagex(ii,jj),imagex(ii,jj+1);
                     imagex(ii+1,jj-1),imagex(ii,jj),imagex(ii,jj+1)];
         end
-        m_image(ii,jj) = median(NH(:));
+        m_image(ii,jj) = median(NH(:)); % Consider using 'min'
     end
 end
 

@@ -34,9 +34,9 @@ for ii = 2:LL-1
 
                     if (~isempty(M_vect)) 
                         l1 = min(M_vect);
-                        for pp = 1:length(M_vect)
-                            Labels(Labels == M_vect(pp)) = l1; % Propagate equivalence throughout matrix
-                        end
+                         for pp = 1:length(M_vect)
+                             Labels(Labels == M_vect(pp)) = l1;
+                         end
                     end
 
                 case 8 % Eight connectivity
@@ -45,16 +45,18 @@ for ii = 2:LL-1
 
                     if (~isempty(M_vect))
                         l1 = min(M_vect);
+
                         for pp = 1:length(M_vect)
                             Labels(Labels == M_vect(pp)) = l1; % Optimise this step (maybe time consuming!)
-                        end
+                        end     
+
                     end
             end
         end
     end
 end
 
-% Second iteration: additional scans
+
 % for ii = LL-1:-1:2
 %     for jj = MM-1:-1:2
 %          M = [Labels(ii,jj-1) Labels(ii,jj) Labels(ii,jj+1);
