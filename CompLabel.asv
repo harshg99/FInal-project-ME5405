@@ -57,7 +57,7 @@ for(ii=1:LL)
                         maxlabel=maxlabel+1;
                         Mappings(maxlabel)=maxlabel;
                         Labels(ii,jj)=maxlabel;
-
+>>>>>>> HGDev
                     end
 
                 case 8 % Eight connectivity
@@ -77,7 +77,7 @@ for(ii=1:LL)
                         maxlabel=maxlabel+1;
                         Mappings(maxlabel)=maxlabel;
                         Labels(ii,jj)=maxlabel;
-
+>>>>>>> HGDev
                     end
             end
           
@@ -92,7 +92,9 @@ for(ii=1:LL)
     end
 end
 
+<<<<<<< HEAD
 
+=======
 %remapping all objects whose labels have been changed
 for(j=1:size(Mappings,1))
     k=j;
@@ -140,7 +142,7 @@ end
 
 
 % Second iteration: additional scans
-
+>>>>>>> HGDev
 % for ii = LL-1:-1:2
 %     for jj = MM-1:-1:2
 %          M = [Labels(ii,jj-1) Labels(ii,jj) Labels(ii,jj+1);

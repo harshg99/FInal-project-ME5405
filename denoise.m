@@ -44,18 +44,28 @@ filter = zeros(2*N,2*M);
 %var = (min([N M])/(4.25)).^2;
 %stdev = sqrt(var);
 %% Section: Filter Type
+switch(length(varargin))
+    case 0
+    var=50;
+    n=2;
+    case 1
+    var=varargin{1};
+    case 2
+    var =varargin{1};
+    n=varargin{2}; 
+end
 switch(ctype)
     case 'Ideal'
         % varargin={'var'} var is variance
-        filter = 1*(dist <= varargin{1});
+        filter = 1*(dist <= var);
     case 'Gaussian'
         % varargin={'var'} var is variance of gauss distribution
-        filter = exp(-(dist.^2)/(2*varargin{1}^2));
+        filter = exp(-(dist.^2)/(2*var^2));
     case 'BLP'
         %varargin={'var'','n''}
         %var is cutoff frequencny
         %n is exponenent for Butterworth Low Pass
-        filter = 1./(1+((dist/varargin{1}).^(2*varargin{2})));
+        filter = 1./(1+((dist/var).^(2*n)));
     case 'BRF'
     case 'BPF'
 end

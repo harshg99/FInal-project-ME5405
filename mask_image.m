@@ -13,7 +13,7 @@ function [img_fil]=mask_image(img,mask)
 %
     
     
-    %modifying image to correct dimensions to get appropriate output
+    %padding image with zerosto correct dimensions to get appropriate output
    
     size_i1=size(img);
     size_m=size(mask);

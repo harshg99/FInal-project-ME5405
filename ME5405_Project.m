@@ -15,7 +15,7 @@ charac = charac.';
 %charac_int = str2num(charac_txt)
 check = charac > '9';
 notcheck = ~check;
-charac = charac - 65.*check - 26.*notcheck;
+charac = charac - 55.*check - 48.*notcheck;
 
 % Show both images
 figure()
@@ -55,9 +55,9 @@ title(["Histogram for characters"]);
 % Currently based on a Fourier denoising process (can also apply median
 % filtering to avoid the coarsening effect).
 
-chip(:,:,1) = abs(denoise(chip(:,:,1),'Gaussian'));
-chip(:,:,2) = abs(denoise(chip(:,:,2),'Gaussian'));
-chip(:,:,3) = abs(denoise(chip(:,:,3),'Gaussian'));
+chip(:,:,1) = abs(denoise(chip(:,:,1),'Gaussian',80));
+chip(:,:,2) = abs(denoise(chip(:,:,2),'Gaussian',80));
+chip(:,:,3) = abs(denoise(chip(:,:,3),'Gaussian',80));
 
 % % Median filtering process
 % chip(:,:,1) = median_filter(chip(:,:,1),8);
@@ -71,10 +71,10 @@ image(chip);
 title(["Denoised chip"]);
 
 %% Thresholding
-t_charac = threshold(charac,16);
-t_chip(:,:,1) = threshold(chip(:,:,1),116);
-t_chip(:,:,2) = threshold(chip(:,:,2),116);
-t_chip(:,:,3) = threshold(chip(:,:,3),116);
+t_charac = threshold(charac,0);
+t_chip(:,:,1) = threshold(chip(:,:,1));
+t_chip(:,:,2) = threshold(chip(:,:,2));
+t_chip(:,:,3) = threshold(chip(:,:,3));
 
 
 % Grayscale version of the rgb chip
@@ -83,7 +83,10 @@ G = 0.5870;
 B = 0.1140;
 gray_chip(:,:) = R*chip(:,:,1) + G*chip(:,:,2) + B*chip(:,:,3);
 
-t_chip_2 = threshold(gray_chip,120);
+t_chip_2 = threshold(gray_chip);
+for(j=1:10)
+    t_chip_2=median_filter(t_chip_2,[5 5]);
+end
 
 %% Segmentation process
 
@@ -92,8 +95,8 @@ back_charac = mode(t_charac(:));
 back_chip = mode(t_chip_2(:));
 
 % Component labelling of thresholded images
-[Labels_charac] = CompLabel(t_charac,8,back_charac);
-[Labels_chip] = CompLabel(t_chip_2,8,back_chip);
+[Labels_charac,num_charac] = CompLabel(t_charac,8,back_charac);
+[Labels_chip,num_chip] = CompLabel(t_chip_2,8,back_chip);
 
 % Segmentation
 [Segment_charac] = Segment(Labels_charac,charac,10);
