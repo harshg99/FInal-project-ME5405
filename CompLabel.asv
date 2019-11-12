@@ -6,7 +6,7 @@ function [Labels,comp_num] = CompLabel(imagex,nhood,isNeg,thresh)
 % imagex: Input binary image (backgorund is 0 and obejcts are 1)
 % nhood: Definition of neighbourhood (4-connectivity or 8-connectivity)
 % back_ground: Background of the image (assumed to be the mode of the pixel distribution), to account for negative images as well. 
-% thresh: eliminates objects below a certain size (default=300)
+% range: eliminates objects below a certain size (default=300)
 
 % OUTPUT
 % Labels: a 2D array of integer labels, each integer label uniquely
@@ -14,7 +14,7 @@ function [Labels,comp_num] = CompLabel(imagex,nhood,isNeg,thresh)
 %
 
 if(nargin<4)
-    thresh=size(imagex,1)*size(imagex,2)/100;
+    thresh=300;
 end
 LL = size(imagex,1);
 MM = size(imagex,2);
@@ -99,40 +99,32 @@ end
 comp_num=max(Mappings);
 % changing the mapped and rlated pixel objects
 
-size_objects=zeros(length(Mappings),1);
+size_objects=zeros(length(Mappings));
 for(ii=1:LL)
     for(jj=1:MM)
         if(Labels(ii,jj)>0)
             Labels(ii,jj)=Mappings(Labels(ii,jj));
-            size_objects(Labels(ii,jj))=size_objects(Labels(ii,jj))+1;
         end
-       
+        size_objects(Labels(ii,jj))=size_objects(Labels(ii,jj))+1;
     end
 end
-
-obj_num=1;
-
-% Evaluate for size
-for(j=1:length(size_objects))
-   if(size_objects(j)>thresh)
-       size_objects(j)=obj_num;
-       obj_num=obj_num+1;
-   else
-       size_objects(j)=0;
-   end 
 end
 
-comp_num=obj_num-1;
-%replacing by new object labels
+% Evaluate for size
+for(j=1:length(size_objects)))
+   if(size_objects(i)<r
+end 
+
 for(ii=1:LL)
     for(jj=1:MM)
         if(Labels(ii,jj)>0)
-            Labels(ii,jj)=size_objects(Labels(ii,jj));
+            size_objects(Labels(ii,jj))=size_objects(Labels(ii,jj))+1;
         end
     end
 end
 end
 
+for
 
 % Second iteration: additional scans
 % for ii = LL-1:-1:2

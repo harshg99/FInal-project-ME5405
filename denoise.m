@@ -34,7 +34,7 @@ cent = [N;M];
 dist = zeros(2*N,2*M);
 for i = 1:size(fftimage,1)
     for j = 1:size(fftimage,2)
-        dist(i,j) = sqrt((i-cent(1))^2 + (N/2/M*(j - cent(2))^2));
+        dist(i,j) = sqrt((i-cent(1))^2 + (N/M*(j - cent(2))^2));
     end
 end
 

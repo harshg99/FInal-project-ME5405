@@ -15,7 +15,7 @@ charac = charac.';
 %charac_int = str2num(charac_txt)
 check = charac > '9';
 notcheck = ~check;
-charac = charac - 65.*check - 26.*notcheck;
+charac = charac - 55.*check - 48.*notcheck;
 
 % Show both images
 figure()
@@ -95,8 +95,8 @@ back_charac = mode(t_charac(:));
 back_chip = mode(t_chip_2(:));
 
 % Component labelling of thresholded images
-[Labels_charac] = CompLabel(t_charac,8,back_charac);
-[Labels_chip] = CompLabel(t_chip_2,8,back_chip);
+[Labels_charac,num_charac] = CompLabel(t_charac,8,back_charac);
+[Labels_chip,num_chip] = CompLabel(t_chip_2,8,back_chip);
 
 % Segmentation
 [Segment_charac] = Segment(Labels_charac,charac,10);
