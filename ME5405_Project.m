@@ -101,6 +101,45 @@ back_chip = mode(t_chip_2(:));
 [Segment_charac] = Segment(Labels_charac,charac,10);
 [Segment_chip] = Segment(Labels_chip,gray_chip,10);
 
+%% Separating characters for the chip
+buffer = 10; thold = 115;
+for kk = 1:length(Segment_chip)
+    col(kk) = size(Segment_chip{1,kk},2);
+end
+
+tot = length(Segment_chip);
+
+for ii = 1:tot
+    r = size(Segment_chip{1,ii},2);
+    if (abs(r - max(col(:))) < abs(r - min(col(:)))) % Multiple characters in one segment (here assumes 2 characters)
+        L = size(Segment_chip{1,ii},1);
+        W = size(Segment_chip{1,ii},2);
+        mid = floor(W/2);
+        Sthold = threshold(Segment_chip{1,ii},thold);
+        Slice = zeros(L,W);
+        Slice(1:L,mid-buffer:mid+buffer) = Sthold(1:L,mid-buffer:mid+buffer); 
+        count = 0;
+        for ll = 1:50
+            count = count + 1;
+            Slice = Erosion(Slice,[1;1;1],2,1);
+            if (~max(Slice(:,mid))) break; end
+        end
+        for ll = 1:count-1
+             Slice = Dilate(Slice,[1;1;1],2,1);
+        end
+        Slice = Erosion(Slice,[1 1 1],1,2); %Trim edges
+        Slice(1:L,1:mid-buffer) = 1; Slice(1:L,mid+buffer:W) = 1;
+        Sthold = logical(Sthold).*logical(Slice);
+%        Top = Sthold(1,:); Left = Sthold(:,1); Bottom = Sthold(end,:); Right = Sthold(:,end);
+        Sthold(1,:) = 0; Sthold(end,:) = 0; Sthold(:,1) = 0; Sthold(:,end) = 0;
+        [Labels_segment_chip] = CompLabel(Sthold,8,0,thres_chip);
+        [Segment_segment_chip] = Segment(Labels_segment_chip,Segment_chip{1,ii},thres_chip);
+        Segment_chip{1,ii} = Segment_segment_chip{1,1};
+        Segment_chip{1,length(Segment_chip)+1} = Segment_segment_chip{1,2};
+    end
+end
+%%
+
 
 
 %% Edge detection for thresholded images
