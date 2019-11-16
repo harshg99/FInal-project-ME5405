@@ -89,6 +89,10 @@ end
 
 %% Segmentation process
 
+% Threshold for segmentation denoising
+thres_charac = 10;
+thres_chip = 300;
+
 % Background of the images
 back_charac = mode(t_charac(:));
 back_chip = mode(t_chip_2(:));
