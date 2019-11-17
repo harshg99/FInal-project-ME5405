@@ -32,8 +32,7 @@ for jj = 1:size(image,2)
 end
 end
 
-% Set tolerance to ensure binary image output (can remove if this is not
-% critical)
+% Set tolerance to ensure binary image output
 tol = 0.5;
 dil(abs(dil) < tol) = 0;
 dil(abs(dil) >= tol) = 1;
