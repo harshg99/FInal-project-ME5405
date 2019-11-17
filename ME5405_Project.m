@@ -38,18 +38,18 @@ s1 = 0:1:length(hist_chip_R)-1;
 s2 = 0:1:length(hist_charac)-1;
 
 % Plot the frequency histograms
-figure()
-plot(s1,hist_chip_R);
-title(["Histogram for chip: Red"]);
-figure()
-plot(s1,hist_chip_G);
-title(["Histogram for chip: Blue"]);
-figure()
-plot(s1,hist_chip_B);
-title(["Histogram for chip: Green"]);
-figure()
-plot(s2,hist_charac);
-title(["Histogram for characters"]);
+% figure()
+% plot(s1,hist_chip_R);
+% title(["Histogram for chip: Red"]);
+% figure()
+% plot(s1,hist_chip_G);
+% title(["Histogram for chip: Blue"]);
+% figure()
+% plot(s1,hist_chip_B);
+% title(["Histogram for chip: Green"]);
+% figure()
+% plot(s2,hist_charac);
+% title(["Histogram for characters"]);
 
 % Grayscale version of the rgb chip
 R = 0.2989;
@@ -90,16 +90,14 @@ title(["Denoised chip"]);
 
 
 %% Thresholding
+
 t_charac = threshold(charac,16);
 t_chip(:,:,1) = threshold(chip(:,:,1),115);
 t_chip(:,:,2) = threshold(chip(:,:,2),115);
 t_chip(:,:,3) = threshold(chip(:,:,3),115);
-t_chip_2 = threshold(gray_chip,115);
 
-% denoise_t_chip_2 = abs(denoise(t_chip_2,'Ideal'));
-% denoise_t_chip_2 = cast(denoise_t_chip_2,"uint8");
-% figure()
-% imshow(denoise_t_chip_2,colormap(gray(2)));
+% Gray-scale thresholded chip used for further analysis
+t_chip_2 = threshold(gray_chip,115);
 
 
 %% Segmentation process
@@ -114,6 +112,7 @@ back_chip = mode(t_chip_2(:));
 
 % Component labelling of thresholded images
 
+% Old version
 % [Labels_charac] = CompLabel(t_charac,8,back_charac);
 % [Labels_chip] = CompLabel(t_chip_2,8,back_chip);
 
@@ -169,7 +168,7 @@ t_chip_2_star = t_chip_2; %Thresholded chip
 t_charac_star = t_charac; %Thresholded characters
 
 
-% Too much noise with graylevel image, so use the thresholded one
+% Using the thresholded version
 for ii = 1:length(Segment_chip)
     tSegment_chip = threshold(Segment_chip{1,ii},115);
     [Edges_chip{1,ii},X_deriv_chip{1,ii},Y_deriv_chip{1,ii}] = EdgeDet(tSegment_chip,3,1,0); 
@@ -183,33 +182,43 @@ end
 
 
 %% Rotation of segmented images
-% Rot_charac{1,1} = rotate(Segment_charac{1,1},90,"Bilinear",1);
-% Rot_charac = cell(1,length(Segment_charac));
-% Rot_chip = cell(1,length(Segment_chip));
-% angles = -90; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
-% 
-% for kk = 1:length(Segment_charac)
-%     Rot_charac{1,kk} = rotate(Segment_charac{1,kk},angles,"Bilinear",1);
-% end
-% 
-% for kk = 1:length(Segment_chip)
-%     Rot_chip{1,kk} = rotate(Segment_chip{1,kk},angles,"Bilinear",1);
-% end
-
-%% Skeletonisation of images (~ one pixel thickness version of the images)
+Rot_charac{1,1} = rotate(Segment_charac{1,1},90,"Bilinear",1);
+Rot_charac = cell(1,length(Segment_charac));
+Rot_chip = cell(1,length(Segment_chip));
+angles = 35; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
 
 for kk = 1:length(Segment_charac)
+    Rot_charac{1,kk} = rotate(Segment_charac{1,kk},angles,"Bilinear",1);
+end
+
+for kk = 1:length(Segment_chip)
+    Rot_chip{1,kk} = rotate(Segment_chip{1,kk},angles,"Bilinear",1);
+end
+
+%% Skeletonisation of images (~ one pixel thickness version of the images): iterative
+iter = 4;
+
+% Run 1
+for kk = 1:length(Segment_charac)
     t_Segment_charac = threshold(Segment_charac{1,kk},16);
-    Skele_charac{1,kk} = Skeletonise(t_Segment_charac,20,1);
-%    Skele_Rot_charac{1,kk} = cast(Skele_Rot_charac,"double").*Rot_charac{1,kk}; % To obtain gray scale version
+    Skele_charac{1,kk} = Skeletonise(t_Segment_charac,20,0,1);
 end
 
 for kk = 1:length(Segment_chip)
     t_Segment_chip = threshold(Segment_chip{1,kk},115);
-    Skele_chip{1,kk} = Skeletonise(t_Segment_chip,20,0);
-%    Skele_Rot_chip{1,kk} = cast(Skele_Rot_chip,"double").*Rot_chip{1,kk}; % To obtain gray scale version
+    Skele_chip{1,kk} = Skeletonise(t_Segment_chip,20,0,1);
 end
 
+% Additional runs to get to one pixel
+iter = iter - 1;
+for ii = 1:iter
+    for kk = 1:length(Segment_charac)
+        Skele_charac{1,kk} = Skeletonise(Skele_charac{1,kk},20,0,0);
+    end
+    for kk = 1:length(Segment_chip)
+        Skele_chip{1,kk} = Skeletonise(Skele_chip{1,kk},20,0,0);
+    end
+end
 
 %% Plots
 
@@ -219,10 +228,10 @@ colormap(gray(2));
 image(t_charac);
 title(["Thresholded characters"]);
 
-figure()
-colormap(gray(2));
-image(t_chip);
-title(["Thresholded chip: thresholding applied to each of R, G and B"]);
+% figure()
+% colormap(gray(2));
+% image(t_chip);
+% title(["Thresholded chip: thresholding applied to each of R, G and B"]);
 
 figure()
 colormap(gray(2));
@@ -247,15 +256,19 @@ end
 
 %% Edge detection
 
-figure()
-colormap(gray(32))
-image(Edges_charac);
-title(["Edges of the character"]);
+for ii = 1:length(Edges_chip)
+    figure()
+    colormap(gray(2))
+    image(Edges_chip{1,ii});
+    title(["Edge chip"]);
+end
 
-figure()
-colormap(gray(255))
-image(Edges_chip);
-title(["Edges of the chip"]);
+for ii = 1:length(Edges_charac)
+    figure()
+    colormap(gray(2))
+    image(Edges_charac{1,ii});
+    title(["Edge character"]);
+end
 
 %% Rotated segments
 for kk = 1:length(Rot_charac)
@@ -272,18 +285,18 @@ for kk = 1:length(Rot_chip)
     title(["Segment chip: Rotated"]);
 end
 
-%% Skeletonised + Rotated images
+%% Skeletonised images
 
-for kk = 1:length(Skele_Rot_charac)
+for kk = 1:length(Skele_charac)
     figure()
     colormap(gray(2));
-    image(Skele_Rot_charac{1,kk});
+    image(Skele_charac{1,kk});
     title(["Segment character (Skeletonised)"]);
 end
 
-for kk = 1:length(Skele_Rot_chip)
+for kk = 1:length(Skele_chip)
     figure()
     colormap(gray(2));
-    image(Skele_Rot_chip{1,kk});
+    image(Skele_chip{1,kk});
     title(["Segment chip (Skeletonised)"]);
 end
