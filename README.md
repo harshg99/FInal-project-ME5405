@@ -11,3 +11,4 @@
 10. Rotate.m: Image rotation
 11. Skeletonise.m: Image skeletonising
 12. Erosion.m and Dilate.m: Morphological operations (erosion and dilate)
+13. Nfilter.m: Nonlinear median/min/max filter for grayscale morphology
