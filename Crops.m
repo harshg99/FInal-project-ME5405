@@ -27,4 +27,5 @@ end
 Window = zeros(hcount,vcount);
 Cropped = imagex(ii_array(1):ii_array(end),jj_array(1):jj_array(end));
 
+
 end
