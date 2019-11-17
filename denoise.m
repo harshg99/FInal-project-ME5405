@@ -29,7 +29,8 @@ end
 % Create a (low-pass) filter over the dist matrix
 
 filter = zeros(2*N,2*M);
-var = (min([N M])/(4.25)).^2;
+k = 4.25;
+var = (min([N M])/(k)).^2;
 stdev = sqrt(var);
 
 switch(ctype)
@@ -51,5 +52,4 @@ for i = 1:size(imagex,1)
         n_image(i,j) = n_image_pad(i,j);
     end
 end
-
 
