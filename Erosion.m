@@ -40,11 +40,9 @@ end
 end
 end
 
-% Set tolerance to ensure binary image output (can remove if this is not
-% critical)
+% Set tolerance to ensure binary image output 
 tol = 0.5;
 dil(abs(Eroded) < tol) = 0;
 dil(abs(Eroded) >= tol) = 1;
 
 end
-
