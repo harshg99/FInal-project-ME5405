@@ -9,4 +9,5 @@ for i = 1:size(image,1)
     end
 end
 h = h/(size(image,1)*size(image,2));
+
 end
