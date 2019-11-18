@@ -1,5 +1,5 @@
 % ME5405: Computer Vision Project
-% Changes
+
 clc;clear;close all;
 
 %% Setting up the image matrix
@@ -10,15 +10,17 @@ fileID = fopen('charact1.txt','r');
 
 % Characters matrix has 32 grayscale levels
 charac = fscanf(fileID,'%s',[64,64]);
+X = charac.';
 charac = charac.';
 
+%charac_int = str2num(charac_txt)
 check = charac > '9';
 notcheck = ~check;
 charac = charac - 55.*check - 48.*notcheck;
 
 % Show both images
 figure()
-image(chip);
+imshow(chip);
 title(["Chip"]);
 
 figure()
@@ -36,27 +38,35 @@ s1 = 0:1:length(hist_chip_R)-1;
 s2 = 0:1:length(hist_charac)-1;
 
 % Plot the frequency histograms
-figure()
-plot(s1,hist_chip_R);
-title(["Histogram for chip: Red"]);
-figure()
-plot(s1,hist_chip_G);
-title(["Histogram for chip: Blue"]);
-figure()
-plot(s1,hist_chip_B);
-title(["Histogram for chip: Green"]);
-figure()
-plot(s2,hist_charac);
-title(["Histogram for characters"]);
+% figure()
+% plot(s1,hist_chip_R);
+% title(["Histogram for chip: Red"]);
+% figure()
+% plot(s1,hist_chip_G);
+% title(["Histogram for chip: Blue"]);
+% figure()
+% plot(s1,hist_chip_B);
+% title(["Histogram for chip: Green"]);
+% figure()
+% plot(s2,hist_charac);
+% title(["Histogram for characters"]);
+
+% Grayscale version of the rgb chip
+R = 0.2989;
+G = 0.5870;
+B = 0.1140;
+gray_chip(:,:) = R*chip(:,:,1) + G*chip(:,:,2) + B*chip(:,:,3);
 
 %% Denoising process
 
 % Currently based on a Fourier denoising process (can also apply median
 % filtering to avoid the coarsening effect).
 
-chip(:,:,1) = abs(denoise(chip(:,:,1),'Gaussian',80));
-chip(:,:,2) = abs(denoise(chip(:,:,2),'Gaussian',80));
-chip(:,:,3) = abs(denoise(chip(:,:,3),'Gaussian',80));
+chip(:,:,1) = abs(denoise(chip(:,:,1),'Gaussian'));
+chip(:,:,2) = abs(denoise(chip(:,:,2),'Gaussian'));
+chip(:,:,3) = abs(denoise(chip(:,:,3),'Gaussian'));
+gray_chip = abs(denoise(gray_chip,'Gaussian'));
+
 
 % % Median filtering process
 % chip(:,:,1) = median_filter(chip(:,:,1),8);
@@ -69,23 +79,26 @@ colormap(gray(255));
 image(chip);
 title(["Denoised chip"]);
 
+figure()
+imshow(gray_chip,colormap(gray(255)));
+title(["Denoised chip"]);
+
+%% Contrast modification
+% chip(:,:,1) = imadjust(chip(:,:,1));
+% chip(:,:,2) = imadjust(chip(:,:,2));
+% chip(:,:,3) = imadjust(chip(:,:,3));
+
+
 %% Thresholding
-t_charac = threshold(charac,0);
-t_chip(:,:,1) = threshold(chip(:,:,1));
-t_chip(:,:,2) = threshold(chip(:,:,2));
-t_chip(:,:,3) = threshold(chip(:,:,3));
 
+t_charac = threshold(charac,16);
+t_chip(:,:,1) = threshold(chip(:,:,1),115);
+t_chip(:,:,2) = threshold(chip(:,:,2),115);
+t_chip(:,:,3) = threshold(chip(:,:,3),115);
 
-% Grayscale version of the rgb chip
-R = 0.2989;
-G = 0.5870;
-B = 0.1140;
-gray_chip(:,:) = R*chip(:,:,1) + G*chip(:,:,2) + B*chip(:,:,3);
+% Gray-scale thresholded chip used for further analysis
+t_chip_2 = threshold(gray_chip,115);
 
-t_chip_2 = threshold(gray_chip);
-for(j=1:10)
-    t_chip_2=median_filter(t_chip_2,[5 5]);
-end
 
 %% Segmentation process
 
@@ -98,14 +111,20 @@ back_charac = mode(t_charac(:));
 back_chip = mode(t_chip_2(:));
 
 % Component labelling of thresholded images
-[Labels_charac,num_charac] = CompLabel(t_charac,8,back_charac);
-[Labels_chip,num_chip] = CompLabel(t_chip_2,8,back_chip);
+
+% Old version
+% [Labels_charac] = CompLabel(t_charac,8,back_charac);
+% [Labels_chip] = CompLabel(t_chip_2,8,back_chip);
+
+[Labels_charac,~] = CompLabel(t_charac,8,0,thres_charac);
+[Labels_chip,~] = CompLabel(t_chip_2,8,0,thres_chip);
 
 % Segmentation
-[Segment_charac] = Segment(Labels_charac,charac,10);
-[Segment_chip] = Segment(Labels_chip,gray_chip,10);
+[Segment_charac] = Segment(Labels_charac,charac,thres_charac);
+[Segment_chip] = Segment(Labels_chip,gray_chip,thres_chip);
 
 %% Separating characters for the chip
+
 buffer = 10; thold = 115;
 for kk = 1:length(Segment_chip)
     col(kk) = size(Segment_chip{1,kk},2);
@@ -142,52 +161,77 @@ for ii = 1:tot
         Segment_chip{1,length(Segment_chip)+1} = Segment_segment_chip{1,2};
     end
 end
-%%
-
-
 
 %% Edge detection for thresholded images
 
 t_chip_2_star = t_chip_2; %Thresholded chip
 t_charac_star = t_charac; %Thresholded characters
 
-num_trials = 1; % In the even of executing multiple edge detection iterations, keep num_trials > 1
 
-for ii = 1:num_trials % Loop controlling no. of iterations of edge detection
-    [Edges_chip,Xderiv_chip,Yderiv_chip] = EdgeDet(t_chip_2_star,1,1); % Too much noise with graylevel image, so use the thresholded one
-    [Edges_charac,Xderiv_charac,Yderiv_charac] = EdgeDet(t_charac_star,1,1);
-    t_chip_2_star = Edges_chip;
-    t_charac_star = Edges_charac;
+% Using the thresholded version
+for ii = 1:length(Segment_chip)
+    tSegment_chip = threshold(Segment_chip{1,ii},115);
+    [Edges_chip{1,ii},X_deriv_chip{1,ii},Y_deriv_chip{1,ii}] = EdgeDet(tSegment_chip,3,1,0); 
 end
 
-%% Rotation of segmented images
+for jj = 1:length(Segment_charac)
+    tSegment_charac = threshold(Segment_charac{1,jj},16);
+    [Edges_charac{1,jj},X_deriv_charac{1,jj},Y_deriv_charac{1,jj}] = EdgeDet(tSegment_charac,3,1,1);
+end
 
+
+
+%% Rotation of segmented images
+Rot_charac{1,1} = rotate(Segment_charac{1,1},90,"Bilinear",1);
 Rot_charac = cell(1,length(Segment_charac));
 Rot_chip = cell(1,length(Segment_chip));
-angle = 35; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
+
+% Rotation 1
+angles = -90; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
 
 for kk = 1:length(Segment_charac)
-    Rot_charac{1,kk} = rotate(Segment_charac{1,kk},angle,"Bilinear");
+    Rot_charac{1,kk} = rotate(Segment_charac{1,kk},angles,"Bilinear",1);
 end
 
 for kk = 1:length(Segment_chip)
-    Rot_chip{1,kk} = rotate(Segment_chip{1,kk},angle,"Bilinear");
+    Rot_chip{1,kk} = rotate(Segment_chip{1,kk},angles,"Bilinear",1);
 end
 
-%% Skeletonisation of images (~ one pixel thickness version of the images)
+% Rotation 2
+angles = 35; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
 
-for kk = 1:length(Rot_charac)
-    t_Rot_charac = threshold(Rot_charac{1,kk},16);
-    Skele_Rot_charac{1,kk} = Skeletonise(t_Rot_charac,20,1);
-%    Skele_Rot_charac{1,kk} = cast(Skele_Rot_charac,"double").*Rot_charac{1,kk}; % To obtain gray scale version
+for kk = 1:length(Segment_charac)
+    Rot_charac{1,kk} = rotate(Rot_charac{1,kk},angles,"Bilinear",1);
 end
 
-for kk = 1:length(Rot_chip)
-    t_Rot_chip = threshold(Rot_chip{1,kk},120);
-    Skele_Rot_chip{1,kk} = Skeletonise(t_Rot_chip,20,0);
-%    Skele_Rot_chip{1,kk} = cast(Skele_Rot_chip,"double").*Rot_chip{1,kk}; % To obtain gray scale version
+for kk = 1:length(Segment_chip)
+    Rot_chip{1,kk} = rotate(Rot_chip{1,kk},angles,"Bilinear",1);
 end
 
+%% Skeletonisation of images (~ one pixel thickness version of the images): iterative
+iter = 4;
+
+% Run 1
+for kk = 1:length(Segment_charac)
+    t_Segment_charac = threshold(Segment_charac{1,kk},16);
+    Skele_charac{1,kk} = Skeletonise(t_Segment_charac,20,0,1);
+end
+
+for kk = 1:length(Segment_chip)
+    t_Segment_chip = threshold(Segment_chip{1,kk},115);
+    Skele_chip{1,kk} = Skeletonise(t_Segment_chip,20,0,1);
+end
+
+% Additional runs to get to one pixel
+iter = iter - 1;
+for ii = 1:iter
+    for kk = 1:length(Segment_charac)
+        Skele_charac{1,kk} = Skeletonise(Skele_charac{1,kk},20,0,0);
+    end
+    for kk = 1:length(Segment_chip)
+        Skele_chip{1,kk} = Skeletonise(Skele_chip{1,kk},20,0,0);
+    end
+end
 
 %% Plots
 
@@ -197,10 +241,10 @@ colormap(gray(2));
 image(t_charac);
 title(["Thresholded characters"]);
 
-figure()
-colormap(gray(2));
-image(t_chip);
-title(["Thresholded chip: thresholding applied to each of R, G and B"]);
+% figure()
+% colormap(gray(2));
+% image(t_chip);
+% title(["Thresholded chip: thresholding applied to each of R, G and B"]);
 
 figure()
 colormap(gray(2));
@@ -225,15 +269,19 @@ end
 
 %% Edge detection
 
-figure()
-colormap(gray(32))
-image(Edges_charac);
-title(["Edges of the character"]);
+for ii = 1:length(Edges_chip)
+    figure()
+    colormap(gray(2))
+    image(Edges_chip{1,ii});
+    title(["Edge chip"]);
+end
 
-figure()
-colormap(gray(255))
-image(Edges_chip);
-title(["Edges of the chip"]);
+for ii = 1:length(Edges_charac)
+    figure()
+    colormap(gray(2))
+    image(Edges_charac{1,ii});
+    title(["Edge character"]);
+end
 
 %% Rotated segments
 for kk = 1:length(Rot_charac)
@@ -250,23 +298,83 @@ for kk = 1:length(Rot_chip)
     title(["Segment chip: Rotated"]);
 end
 
-%% Skeletonised + Rotated images
+%% Skeletonised images
 
-for kk = 1:length(Skele_Rot_charac)
+for kk = 1:length(Skele_charac)
     figure()
     colormap(gray(2));
-    image(Skele_Rot_charac{1,kk});
+    image(Skele_charac{1,kk});
     title(["Segment character (Skeletonised)"]);
 end
 
-for kk = 1:length(Skele_Rot_chip)
+for kk = 1:length(Skele_chip)
     figure()
     colormap(gray(2));
-    image(Skele_Rot_chip{1,kk});
+    image(Skele_chip{1,kk});
     title(["Segment chip (Skeletonised)"]);
 end
 
-%%
-% To do:
-% Scale and display characters in a given sequence
+%% Scale and display characters in a given sequence
+space = [30, 20];  % Spaces between each characters in x and y coordinates
+img_scale = [30, 24];  % Pixel sizes of each of the segmented character
 
+% for image 1 character = 1A2B3C
+size_char_segment = size(Segment_charac);
+no_char = size_char_segment(1,2);
+for i=1:no_char
+    binary_img = threshold(cell2mat(Segment_charac(i)),0.5);
+    resized_img = imresize(binary_img, img_scale)
+    indiv_char(:,:,i) = resized_img
+end
+% Arrange charracter in the correct sequence/order
+sqnced_char(:,:,1) = indiv_char(:,:,4);  %1
+sqnced_char(:,:,2) = indiv_char(:,:,1);  %A
+sqnced_char(:,:,3) = indiv_char(:,:,5);  %2
+sqnced_char(:,:,4) = indiv_char(:,:,2);  %B
+sqnced_char(:,:,5) = indiv_char(:,:,6);  %3
+sqnced_char(:,:,6) = indiv_char(:,:,3);  %C
+
+% Create zeros to place the sequence character
+Char_sequenced = zeros(2*space(1)+img_scale(1), (no_char+1)*space(2)+no_char*img_scale(2));
+for i=1:no_char
+    index = space(2)*i + img_scale(2)*(i-1)
+    Char_sequenced(space(1):space(1)+img_scale(1)-1, index:index+img_scale(2)-1) = sqnced_char(:,:,i)
+end
+
+figure;
+imshow(Char_sequenced);
+title("Scaled and sequenced character");
+
+% for image 2 = chip 7M2HD44780A00
+size_chip_segment = size(Segment_chip);
+no_chip = size_chip_segment(1,2);
+for i=1:no_chip
+    binary_img = threshold(cell2mat(Segment_chip(i)),0.5);
+    resized_img = imresize(binary_img, [30,24])
+    indiv_chip(:,:,i) = resized_img
+end
+% Arrange chip in the correct sequence/order
+sqnced_chip(:,:,1) = indiv_chip(:,:,1);    %7
+sqnced_chip(:,:,2) = indiv_chip(:,:,10);   %M
+sqnced_chip(:,:,3) = indiv_chip(:,:,2);    %2
+sqnced_chip(:,:,4) = indiv_chip(:,:,9);    %H
+sqnced_chip(:,:,5) = indiv_chip(:,:,5);    %D
+sqnced_chip(:,:,6) = indiv_chip(:,:,7);    %4
+sqnced_chip(:,:,7) = indiv_chip(:,:,12);   %4
+sqnced_chip(:,:,8) = indiv_chip(:,:,4);    %7
+sqnced_chip(:,:,9) = indiv_chip(:,:,6);    %8
+sqnced_chip(:,:,10) = indiv_chip(:,:,3);   %0
+sqnced_chip(:,:,11) = indiv_chip(:,:,8);   %A
+sqnced_chip(:,:,12) = indiv_chip(:,:,11);  %0
+sqnced_chip(:,:,13) = indiv_chip(:,:,13);  %0
+
+% Create zeros to place the sequence chip
+Chip_sequenced = zeros(2*space(1)+img_scale(1), (no_chip+1)*space(2)+no_chip*img_scale(2));
+for i=1:no_chip
+    index = space(2)*i + img_scale(2)*(i-1)
+    Chip_sequenced(space(1):space(1)+img_scale(1)-1, index:index+img_scale(2)-1) = sqnced_chip(:,:,i)
+end
+
+figure;
+imshow(Chip_sequenced);
+title("Scaled and sequenced chip");
