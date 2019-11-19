@@ -318,12 +318,11 @@ end
 space = [30, 20];  % Spaces between each characters in x and y coordinates
 new_size = [30, 24];  % Pixel sizes of each of the segmented character
 
-% for image 1 character = 1A2B3C
+% For image 1 character = 1A2B3C
 size_char_segment = size(Segment_charac);
 no_char = size_char_segment(1,2);
 for i=1:no_char
-    char_img = cell2mat(Segment_charac(i));
-    resized_img = scale(char_img,new_size,"Bilinear",1)
+    resized_img = scale(Segment_charac{1,i},new_size,"Bilinear",1)
     indiv_char(:,:,i) = resized_img
 end
 % Arrange charracter in the correct sequence/order
@@ -342,16 +341,21 @@ for i=1:no_char
 end
 
 figure;
-imshow(Char_sequenced);
-title("Scaled and sequenced character");
+colormap(gray(32));
+image(Char_sequenced);
+title("Scaled and sequenced character (32 gray scale)");
 
-% for image 2 = chip 7M2HD44780A00
+figure;
+colormap(gray(2));
+image(Char_sequenced);
+title("Scaled and sequenced character (binary)");
+
+% For image 2 = chip 7M2HD44780A00
 size_chip_segment = size(Segment_chip);
 no_chip = size_chip_segment(1,2);
 new_size = [30,24]
 for i=1:no_chip
-    chip_img = cell2mat(Segment_chip(i));
-    resized_img = scale(chip_img,new_size,"Bilinear",1);
+    resized_img = scale(Segment_chip{1,i},new_size,"Bilinear",1);
     indiv_chip(:,:,i) = resized_img
 end
 % Arrange chip in the correct sequence/order
@@ -377,5 +381,11 @@ for i=1:no_chip
 end
 
 figure;
-imshow(Chip_sequenced);
-title("Scaled and sequenced chip");
+colormap(gray(255));
+image(Chip_sequenced);
+title("Scaled and sequenced character (255 gray scale)");
+
+figure;
+colormap(gray(2));
+image(Chip_sequenced);
+title("Scaled and sequenced character (binary)");
