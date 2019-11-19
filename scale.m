@@ -8,11 +8,23 @@ image = cast(image,'uint8');
 originX = 1; originY = 1;
 maxX = size(image,2); maxY = size(image,1);
 
-Xscale = new_size(2)/size(image,2);
-Yscale = new_size(1)/size(image,1);
+Xscale = size(image,2)/new_size(2);
+Yscale = size(image,1)/new_size(1);
 
-%% Rotation by angle degrees about centroid
-L = max([Xscale*size(image,1), Yscale*size(image,2)]);
+%% Evaluate the centroidal location
+x = 0:1:size(image,2)-1; y = 0:1:size(image,1)-1;
+%x = x - originX; y = y - originY;
+image2 = double(image);
+[X, Y] = meshgrid(x,y); total_mass = sum(image2(:));
+X = double(X); Y = double(Y); 
+dXmass = image2.*X; dXmass_sum = sum(dXmass(:)); 
+dYmass = image2.*Y; dYmass_sum = sum(dYmass(:));
+
+dXcent = round(dXmass_sum/total_mass);
+dYcent = round(dYmass_sum/total_mass);
+
+%% Rescale the image about centroid
+L = 2*max([(1/Xscale)*size(image,1), (1/Yscale)*size(image,2)]);
 
 if (constant)
     x = -L:1:L; y = -L:1:L;
@@ -32,10 +44,10 @@ for ii = 1:size(dXX,1)
         
         % For now define a 4 point neighbourhood. If bicubic - requires a
         % 16 point neighbourhood
-        y1 = floor(pointY); I1 = 0;
-        y2 = ceil(pointY); I2 = 0;
-        x1 = floor(pointX); I3 = 0;
-        x2 = ceil(pointX); I4 = 0;
+        y1 = floor(pointY + dYcent); I1 = 0;
+        y2 = ceil(pointY + dYcent); I2 = 0;
+        x1 = floor(pointX + dXcent); I3 = 0;
+        x2 = ceil(pointX + dXcent); I4 = 0;
         
         if (y1 > 0 && x1 > 0 && y1 <= maxY && x1 <= maxX)
             I1 = image(y1,x1);
@@ -67,11 +79,18 @@ for ii = 1:size(dXX,1)
                     image_nhood(2,2)*deta*deps;
         end
     end
+        
 end
 
 if (constant)
-    scaled_image = Crops(out_image);
+    cropped_image = Crops(out_image);
 else
-    scaled_image = out_image;
+    cropped_image = out_image;
 end
+
+% There will be 1 additional size on X and Y matrix which is caused by the
+% above interpolation
+% Additional cropping will be added for this cases
+scaled_image = cropped_image(1:new_size(1),1:new_size(2))
+
 end

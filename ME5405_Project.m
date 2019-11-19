@@ -316,14 +316,14 @@ end
 
 %% Scale and display characters in a given sequence
 space = [30, 20];  % Spaces between each characters in x and y coordinates
-img_scale = [30, 24];  % Pixel sizes of each of the segmented character
+new_size = [30, 24];  % Pixel sizes of each of the segmented character
 
 % for image 1 character = 1A2B3C
 size_char_segment = size(Segment_charac);
 no_char = size_char_segment(1,2);
 for i=1:no_char
-    binary_img = threshold(cell2mat(Segment_charac(i)),0.5);
-    resized_img = imresize(binary_img, img_scale)
+    char_img = cell2mat(Segment_charac(i));
+    resized_img = scale(char_img,new_size,"Bilinear",1)
     indiv_char(:,:,i) = resized_img
 end
 % Arrange charracter in the correct sequence/order
@@ -334,11 +334,11 @@ sqnced_char(:,:,4) = indiv_char(:,:,2);  %B
 sqnced_char(:,:,5) = indiv_char(:,:,6);  %3
 sqnced_char(:,:,6) = indiv_char(:,:,3);  %C
 
-% Create zeros to place the sequence character
-Char_sequenced = zeros(2*space(1)+img_scale(1), (no_char+1)*space(2)+no_char*img_scale(2));
+% Create zeros to place the sequence character: zero padding
+Char_sequenced = zeros(2*space(1)+new_size(1), (no_char+1)*space(2)+no_char*new_size(2));
 for i=1:no_char
-    index = space(2)*i + img_scale(2)*(i-1)
-    Char_sequenced(space(1):space(1)+img_scale(1)-1, index:index+img_scale(2)-1) = sqnced_char(:,:,i)
+    index = space(2)*i + new_size(2)*(i-1)
+    Char_sequenced(space(1):space(1)+new_size(1)-1, index:index+new_size(2)-1) = sqnced_char(:,:,i)
 end
 
 figure;
@@ -348,9 +348,11 @@ title("Scaled and sequenced character");
 % for image 2 = chip 7M2HD44780A00
 size_chip_segment = size(Segment_chip);
 no_chip = size_chip_segment(1,2);
+new_size = [30,24]
 for i=1:no_chip
-    binary_img = threshold(cell2mat(Segment_chip(i)),0.5);
-    resized_img = imresize(binary_img, [30,24])
+    chip_img = cell2mat(Segment_chip(i));
+    resized_img = scale(chip_img,new_size,"Bilinear",1);
+%     binary_img = threshold(resized_img,0.5);
     indiv_chip(:,:,i) = resized_img
 end
 % Arrange chip in the correct sequence/order
@@ -368,11 +370,11 @@ sqnced_chip(:,:,11) = indiv_chip(:,:,8);   %A
 sqnced_chip(:,:,12) = indiv_chip(:,:,11);  %0
 sqnced_chip(:,:,13) = indiv_chip(:,:,13);  %0
 
-% Create zeros to place the sequence chip
-Chip_sequenced = zeros(2*space(1)+img_scale(1), (no_chip+1)*space(2)+no_chip*img_scale(2));
+% Create zeros to place the sequence chip : zero padding
+Chip_sequenced = zeros(2*space(1)+new_size(1), (no_chip+1)*space(2)+no_chip*new_size(2));
 for i=1:no_chip
-    index = space(2)*i + img_scale(2)*(i-1)
-    Chip_sequenced(space(1):space(1)+img_scale(1)-1, index:index+img_scale(2)-1) = sqnced_chip(:,:,i)
+    index = space(2)*i + new_size(2)*(i-1)
+    Chip_sequenced(space(1):space(1)+new_size(1)-1, index:index+new_size(2)-1) = sqnced_chip(:,:,i)
 end
 
 figure;
