@@ -1,5 +1,5 @@
 function scaled_image = scale(image,new_size,interpol,constant)
-% Rotates an image by angle degrees
+% Rezise/scale the image to the desire size
 % constant == 0: image that rotates outside is cropped out
 % constant == 1: retains the image fully, changes matrix domain
 
