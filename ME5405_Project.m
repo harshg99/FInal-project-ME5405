@@ -352,7 +352,6 @@ new_size = [30,24]
 for i=1:no_chip
     chip_img = cell2mat(Segment_chip(i));
     resized_img = scale(chip_img,new_size,"Bilinear",1);
-%     binary_img = threshold(resized_img,0.5);
     indiv_chip(:,:,i) = resized_img
 end
 % Arrange chip in the correct sequence/order
