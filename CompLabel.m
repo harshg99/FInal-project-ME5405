@@ -6,7 +6,7 @@ function [Labels,comp_num] = CompLabel(imagex,nhood,isNeg,thresh)
 % imagex: Input binary image (backgorund is 0 and obejcts are 1)
 % nhood: Definition of neighbourhood (4-connectivity or 8-connectivity)
 % back_ground: Background of the image (assumed to be the mode of the pixel distribution), to account for negative images as well. 
-% thresh: eliminates objects below a certain size (default=300)
+% thresh: eliminates objects below a certain size (default=based on image size)
 
 % OUTPUT
 % Labels: a 2D array of integer labels, each integer label uniquely
@@ -15,7 +15,7 @@ function [Labels,comp_num] = CompLabel(imagex,nhood,isNeg,thresh)
 
 if(nargin<4)
     thresh=size(imagex,1)*size(imagex,2)/100;
-end
+end 
 LL = size(imagex,1);
 MM = size(imagex,2);
 if(isNeg)
@@ -133,7 +133,8 @@ for(ii=1:LL)
     for(jj=1:MM)
         if(Labels(ii,jj)>0)
             Labels(ii,jj)=size_objects(Labels(ii,jj));
-        end
+        else
+            Labels(ii,jj)=0;
     end
 end
 end

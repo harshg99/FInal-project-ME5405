@@ -50,6 +50,7 @@ switch(length(varargin))
     n=2;
     case 1
     var=varargin{1};
+    n=2;
     case 2
     var =varargin{1};
     n=varargin{2}; 

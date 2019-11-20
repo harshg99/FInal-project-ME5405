@@ -36,27 +36,33 @@ s1 = 0:1:length(hist_chip_R)-1;
 s2 = 0:1:length(hist_charac)-1;
 
 % Plot the frequency histograms
-figure()
-plot(s1,hist_chip_R);
-title(["Histogram for chip: Red"]);
-figure()
-plot(s1,hist_chip_G);
-title(["Histogram for chip: Blue"]);
-figure()
-plot(s1,hist_chip_B);
-title(["Histogram for chip: Green"]);
-figure()
-plot(s2,hist_charac);
-title(["Histogram for characters"]);
+% figure()
+% plot(s1,hist_chip_R);
+% title(["Histogram for chip: Red"]);
+% figure()
+% plot(s1,hist_chip_G);
+% title(["Histogram for chip: Blue"]);
+% figure()
+% plot(s1,hist_chip_B);
+% title(["Histogram for chip: Green"]);
+% figure()
+% plot(s2,hist_charac);
+% title(["Histogram for characters"]);
 
 %% Denoising process
 
 % Currently based on a Fourier denoising process (can also apply median
 % filtering to avoid the coarsening effect).
 
-chip(:,:,1) = abs(denoise(chip(:,:,1),'Gaussian',80));
-chip(:,:,2) = abs(denoise(chip(:,:,2),'Gaussian',80));
-chip(:,:,3) = abs(denoise(chip(:,:,3),'Gaussian',80));
+% chip(:,:,1) = abs(denoise(chip(:,:,1),'Gaussian',100));
+% chip(:,:,2) = abs(denoise(chip(:,:,2),'Gaussian',100));
+% chip(:,:,3) = abs(denoise(chip(:,:,3),'Gaussian',100));
+
+% BLP
+chip(:,:,1) = abs(denoise(chip(:,:,1),'BLP',100,2));
+chip(:,:,2) = abs(denoise(chip(:,:,2),'BLP',100,2));
+chip(:,:,3) = abs(denoise(chip(:,:,3),'BLP',100,2));
+
 
 % % Median filtering process
 % chip(:,:,1) = median_filter(chip(:,:,1),8);
@@ -77,14 +83,15 @@ t_chip(:,:,3) = threshold(chip(:,:,3));
 
 
 % Grayscale version of the rgb chip
-R = 0.2989;
+R = 0.2990;
 G = 0.5870;
 B = 0.1140;
 gray_chip(:,:) = R*chip(:,:,1) + G*chip(:,:,2) + B*chip(:,:,3);
 
-t_chip_2 = threshold(gray_chip);
-for(j=1:10)
-    t_chip_2=median_filter(t_chip_2,[5 5]);
+t_chip_2 = threshold(gray_chip,118);
+t_chip_3=t_chip_2;
+for(j=1:2)
+   t_chip_3=median_filter(t_chip_3,[5 5]);
 end
 
 %% Segmentation process
@@ -95,7 +102,7 @@ back_chip = mode(t_chip_2(:));
 
 % Component labelling of thresholded images
 [Labels_charac,num_charac] = CompLabel(t_charac,8,back_charac);
-[Labels_chip,num_chip] = CompLabel(t_chip_2,8,back_chip);
+[Labels_chip,num_chip] = CompLabel(t_chip_3,8,back_chip,300);
 
 % Segmentation
 [Segment_charac] = Segment(Labels_charac,charac,10);
@@ -120,7 +127,7 @@ end
 %% Rotation of segmented images
 
 Rot_charac = cell(1,length(Segment_charac));
-Rot_chip = cell(1,length(Segment_chip));
+Rot_chip = cell(1,length(Segment_chip)); 
 angle = 35; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
 
 for kk = 1:length(Segment_charac)

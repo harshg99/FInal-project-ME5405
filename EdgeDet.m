@@ -24,26 +24,10 @@ switch itype
             -1 0 1];     
 end
 
-kern = size(G_x,1);
 
-% Populate the derivative matrices (\nabla f)
-Xderiv = zeros(size(imagex));
-Yderiv = zeros(size(imagex));
+Xderiv = mask_image(imagex,G_x);
+Yderiv = mask_image(imagex,G_y);
 
-for ii = 2:size(imagex,1)-1
-    for jj = 2:size(imagex,2)-1
-        sumX = 0;
-        sumY = 0;
-        for kk = 1:kern^2
-            i_star = floor((kk-1)/kern)+1; i_diff = i_star - (kern - 1);
-            j_star = mod((kk-1),kern)+1; j_diff = j_star - (kern - 1);
-            sumX = sumX + G_x(i_star,j_star)*imagex(ii-i_diff,jj-j_diff);
-            sumY = sumY + G_y(i_star,j_star)*imagex(ii-i_diff,jj-j_diff);
-        end
-        Xderiv(ii,jj) = sumX;
-        Yderiv(ii,jj) = sumY;
-    end
-end
 
 Xderiv1 = abs(Xderiv);
 Yderiv1 = abs(Yderiv);
@@ -51,7 +35,8 @@ Yderiv1 = abs(Yderiv);
 % Edge detection using threshold
  
 Edges = zeros(size(imagex));
-Edges(Xderiv1 > thold | Yderiv1 > thold) = 255;
+%Edges(Xderiv1 > thold | Yderiv1 > thold) = 255;
+Edges=(Xderiv1+Yderiv1);%>thold;
 
 Xderiv(Xderiv1 < thold) = 0;
 Yderiv(Yderiv1 < thold) = 0;

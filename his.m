@@ -9,4 +9,10 @@ for i = 1:size(image,1)
     end
 end
 h = h/sum(h);
+
+%% Plotting the histogram
+figure;
+bar(1:levels,h);
+xlabel('Bins');
+ylabel('Frequency');
 end
