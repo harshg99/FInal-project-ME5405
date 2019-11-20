@@ -21,7 +21,7 @@ if(size(varargin)>=1)
     return
 end
 
-imghist=his(imagex,256);
+imghist=his(imagex,256,0);
 maxerror=intmin;
 thresh=[];
 mu_t=sum(imghist.*[0:255]);

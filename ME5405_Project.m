@@ -1,3 +1,4 @@
+
 % ME5405: Computer Vision Project
 % Changes
 clc;clear;close all;
@@ -28,10 +29,10 @@ title(["Characters"]);
 
 %% Image histogram
 
-hist_chip_R = his(chip(:,:,1),256);
-hist_chip_G = his(chip(:,:,2),256);
-hist_chip_B = his(chip(:,:,3),256);
-hist_charac = his(charac,32);
+hist_chip_R = his(chip(:,:,1),256,0);
+hist_chip_G = his(chip(:,:,2),256,0);
+hist_chip_B = his(chip(:,:,3),256,0);
+hist_charac = his(charac,32,0);
 s1 = 0:1:length(hist_chip_R)-1;
 s2 = 0:1:length(hist_charac)-1;
 
@@ -77,6 +78,10 @@ title(["Denoised chip"]);
 
 %% Thresholding
 t_charac = threshold(charac,0);
+figure();
+imshow(t_charac,[0 1]);
+title(["Thresholded image character 1"]);
+
 t_chip(:,:,1) = threshold(chip(:,:,1));
 t_chip(:,:,2) = threshold(chip(:,:,2));
 t_chip(:,:,3) = threshold(chip(:,:,3));
@@ -94,6 +99,11 @@ for(j=1:2)
    t_chip_3=median_filter(t_chip_3,[5 5]);
 end
 
+figure();
+imshow(t_chip_3,[0 1]);
+title(["Thresholded Image 2"]);
+
+
 %% Segmentation process
 
 % Background of the images
@@ -102,7 +112,14 @@ back_chip = mode(t_chip_2(:));
 
 % Component labelling of thresholded images
 [Labels_charac,num_charac] = CompLabel(t_charac,8,back_charac);
+figure();
+imshow(Labels_charac+1,[0 num_charac+3]);
+title(["Characters Image 1"]);
+
 [Labels_chip,num_chip] = CompLabel(t_chip_3,8,back_chip,300);
+figure();
+imshow(Labels_chip+2,[0 num_chip+6]);
+title(["Characters Image 2"]);
 
 % Segmentation
 [Segment_charac] = Segment(Labels_charac,charac,10);
@@ -130,107 +147,39 @@ Rot_charac = cell(1,length(Segment_charac));
 Rot_chip = cell(1,length(Segment_chip)); 
 angle = 35; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
 
+Rot_charac{1,1} = rotate(Segment_charac{1,1},90,"Bilinear",1);
+Rot_charac = cell(1,length(Segment_charac));
+Rot_chip = cell(1,length(Segment_chip));
+
+% Rotation 1
+angles = -90; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
+
 for kk = 1:length(Segment_charac)
-    Rot_charac{1,kk} = rotate(Segment_charac{1,kk},angle,"Bilinear");
+    Rot_charac{1,kk} = rotate(Segment_charac{1,kk},angles,"Bilinear",1);
 end
 
 for kk = 1:length(Segment_chip)
-    Rot_chip{1,kk} = rotate(Segment_chip{1,kk},angle,"Bilinear");
+    Rot_chip{1,kk} = rotate(Segment_chip{1,kk},angles,"Bilinear",1);
 end
 
-%% Skeletonisation of images (~ one pixel thickness version of the images)
-
-for kk = 1:length(Rot_charac)
-    t_Rot_charac = threshold(Rot_charac{1,kk},16);
-    Skele_Rot_charac{1,kk} = Skeletonise(t_Rot_charac,20,1);
-%    Skele_Rot_charac{1,kk} = cast(Skele_Rot_charac,"double").*Rot_charac{1,kk}; % To obtain gray scale version
-end
-
-for kk = 1:length(Rot_chip)
-    t_Rot_chip = threshold(Rot_chip{1,kk},120);
-    Skele_Rot_chip{1,kk} = Skeletonise(t_Rot_chip,20,0);
-%    Skele_Rot_chip{1,kk} = cast(Skele_Rot_chip,"double").*Rot_chip{1,kk}; % To obtain gray scale version
-end
-
-
-%% Plots
-
-%% Thresholded images
-figure()
-colormap(gray(2));
-image(t_charac);
-title(["Thresholded characters"]);
-
-figure()
-colormap(gray(2));
-image(t_chip);
-title(["Thresholded chip: thresholding applied to each of R, G and B"]);
-
-figure()
-colormap(gray(2));
-image(t_chip_2);
-title(["Thresholded chip: thresholding applied to grayscale"]);
-
-%% Segmented images
+% Rotation 2
+angles = 35; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
 
 for kk = 1:length(Segment_charac)
-    figure()
-    colormap(gray(32));
-    image(Segment_charac{1,kk});
-    title(["Segment character"]);
+    Rot_charac{1,kk} = rotate(Rot_charac{1,kk},angles,"Nearest",1);
 end
 
 for kk = 1:length(Segment_chip)
-    figure()
-    colormap(gray(255));
-    image(Segment_chip{1,kk});
-    title(["Segment chip"]);
+    Rot_chip{1,kk} = rotate(Rot_chip{1,kk},angles,"Bilinear",1);
 end
 
-%% Edge detection
+% Net rotation for verification
+angles = -55; % Rotation angle in degrees (+ve: anticlockwise, -ve: clockwise)
 
-figure()
-colormap(gray(32))
-image(Edges_charac);
-title(["Edges of the character"]);
-
-figure()
-colormap(gray(255))
-image(Edges_chip);
-title(["Edges of the chip"]);
-
-%% Rotated segments
-for kk = 1:length(Rot_charac)
-    figure()
-    colormap(gray(32));
-    image(Rot_charac{1,kk});
-    title(["Segment character: Rotated"]);
+for kk = 1:length(Segment_charac)
+    Rot_charac2{1,kk} = rotate(Segment_charac{1,kk},angles,"Bilinear",1);
 end
 
-for kk = 1:length(Rot_chip)
-    figure()
-    colormap(gray(255));
-    image(Rot_chip{1,kk});
-    title(["Segment chip: Rotated"]);
+for kk = 1:length(Segment_chip)
+    Rot_chip2{1,kk} = rotate(Segment_chip{1,kk},angles,"Bilinear",1);
 end
-
-%% Skeletonised + Rotated images
-
-for kk = 1:length(Skele_Rot_charac)
-    figure()
-    colormap(gray(2));
-    image(Skele_Rot_charac{1,kk});
-    title(["Segment character (Skeletonised)"]);
-end
-
-for kk = 1:length(Skele_Rot_chip)
-    figure()
-    colormap(gray(2));
-    image(Skele_Rot_chip{1,kk});
-    title(["Segment chip (Skeletonised)"]);
-end
-
-%%
-% To do:
-% Scale and display characters in a given sequence
-

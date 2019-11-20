@@ -41,6 +41,7 @@ end
 % Create a (low-pass) filter over the dist matrix
 
 filter = zeros(2*N,2*M);
+
 %var = (min([N M])/(4.25)).^2;
 %stdev = sqrt(var);
 %% Section: Filter Type
@@ -55,6 +56,7 @@ switch(length(varargin))
     var =varargin{1};
     n=varargin{2}; 
 end
+
 switch(ctype)
     case 'Ideal'
         % varargin={'var'} var is variance
@@ -71,7 +73,7 @@ switch(ctype)
     case 'BPF'
 end
 %%
-imshow(mat2gray(filter)*255,[0 255]);
+%imshow(mat2gray(filter)*255,[0 255]);
 % Convolution
 fftimage_filter = fftimage.*filter;
 
@@ -85,4 +87,5 @@ for i = 1:size(imagex,1)
     end
 end
 n_image=uint8(abs(n_image));
+
 

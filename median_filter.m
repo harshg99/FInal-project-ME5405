@@ -12,6 +12,13 @@ function m_image = median_filter(imagex,mask)
 
 
 
+% INPUT
+% nhood: [int8] Neighbourhood definition (4 or 8)
+% imagex: grayscale image in 0 to 255
+
+% OUTPUT
+% m_image: median filtered image output (same type as imagex);
+
 % nhood is the neighbourhood definition (4 or 8)
 L = size(imagex,1);
 M = size(imagex,2);
@@ -59,12 +66,6 @@ for ii = i_s:i_f
         if(length(mask)==2)
             NH = imagex((ii-bound_l):(ii+bound_r),(jj-bound_u):(jj+bound_d));
         end
-
             m_image(ii,jj) = median(NH(:));
-
     end
 end
-
-
-
-
