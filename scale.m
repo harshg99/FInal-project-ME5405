@@ -99,6 +99,6 @@ end
 % There may be 1 additional size on X and Y matrix which is caused by the
 % above interpolation
 % Additional cropping will be added for this cases
-scaled_image = cropped_image(1:new_size(1),1:new_size(2))
+scaled_image = cropped_image(1:new_size(1),1:new_size(2));
 
 end
