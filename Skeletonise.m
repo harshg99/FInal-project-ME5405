@@ -102,7 +102,7 @@ end
 % each disk
 
 Skeleton = zeros(size(new_image)); 
-Skeleton = cast(Skeleton,"int8");
+Skeleton = cast(Skeleton,'int8');
 
 for n = 0:N
     Sn = S{1,n+1};

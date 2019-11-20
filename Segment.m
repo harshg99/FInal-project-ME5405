@@ -23,19 +23,6 @@ end
 
 % Denoising to remove noise segments: commented out as component labelling already removes noisy segments
 
-% count = 0;
-% for kk = 1:size(Full_Image_Segments,3)
-%     M = Full_Image_Segments(:,:,kk); M(M ~= 0) = 1;
-%     if (sum(M(:)) < Min_size)
-%         count = count + 1;
-%         check(count) = kk;
-%     end
-% end
-% if (count > 0)
-%     for kk = length(check):-1:1
-%         Full_Image_Segments(:,:,kk) = [];
-%     end
-% end
 
 Image_Segments = cell(1,size(Full_Image_Segments,3));  
 

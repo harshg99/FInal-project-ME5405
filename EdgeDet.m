@@ -1,5 +1,5 @@
 
-function [Edges,Xderiv,Yderiv] = EdgeDet(imagex,thold,itype)
+function [Edges,Xderiv,Yderiv] = EdgeDet(imagex,thold,itype,subpixel)
 % Function outputs the matrix of edges used for further analysis (Edges)
 
 % INPUT
@@ -7,7 +7,7 @@ function [Edges,Xderiv,Yderiv] = EdgeDet(imagex,thold,itype)
 % imagex: input image (grayscale: [uint8]);
 % thold: threshold to determine edges
 % itype: determines the type of derivative operator: Sobel (for now)
-
+% subpixel: breaks [1 1] block to [subpixel subpixel] blocks;
 % OUTPUT
 % Edges: Edges defined by magnitude of gradient greater than a certain thold (threshold) => grayscale
 % Xderiv, Yderiv: derivatives w.r.t x and y matrices constructed separately.
@@ -23,6 +23,19 @@ switch itype
         G_y = [-1 0 1;
             -2 0 2;
             -1 0 1];     
+end
+
+if(nargin==4)
+    Xarray = (1:subpixel*size(imagex,1))/subpixel; 
+    Yarray = (1:subpixel*size(imagex,2))/subpixel; 
+    [X,Y] = meshgrid(Yarray,Xarray);
+
+    for ii = 1:size(X,1)
+        for jj = 1:size(X,2)
+            new_image(ii,jj) = imagex(ceil(Y(ii,jj)),ceil(X(ii,jj)));
+        end
+    end
+    imagex=new_image;
 end
 
 
