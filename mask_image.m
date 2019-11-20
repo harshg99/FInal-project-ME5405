@@ -9,7 +9,7 @@ function [img_fil]=mask_image(img,mask)
 %                   
 %--------------------
 % Outputs:
-% img_fil   [unit8] image after convovling/correlating with mask
+% img_fil   [double] processed rimage after convolving/correlating with mask
 %
     
     
@@ -28,5 +28,5 @@ function [img_fil]=mask_image(img,mask)
             img_fil(i,j)=correl(img(i:(i+size_m(1)-1),j:(j+size_m(2)-1)),mask);
         end
     end
-    img_fil=uint8(img_fil*255);
+    img_fil=img_fil;
 end

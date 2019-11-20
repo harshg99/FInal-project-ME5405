@@ -16,15 +16,15 @@ function [Labels,comp_num] = CompLabel(imagex,nhood,isNeg,thresh)
 if(nargin<4)
     thresh=size(imagex,1)*size(imagex,2)/100;
 end
-LL = size(imagex,1);
-MM = size(imagex,2);
+
 if(isNeg)
     imagex=1-imagex;
 end
 % background represented by -1; all objects assigned 0
 Labels = imagex-1;
 
-
+LL=size(imagex,1);
+MM=size(imagex,2);
 % First iteration
 
  
@@ -32,8 +32,7 @@ Mappings=[];
 maxlabel=0;
 
 for(ii=1:LL)
-    for(jj=1:MM)
-                            
+    for(jj=1:MM)                         
             if(Labels(ii,jj)==0)
                
                 M = [Labels(ii-1,jj-1) Labels(ii-1,jj) Labels(ii-1,jj+1); % Defines the neighbourhood matrix of labels
@@ -65,7 +64,6 @@ for(ii=1:LL)
                     M_vect(M_vect == -1) = [];
 
                     if (~isempty(M_vect))
-
                         l1 = min(Mappings(M_vect));
                         for pp = 1:length(M_vect)
                           if(Mappings(M_vect(pp)) > l1)
@@ -88,6 +86,7 @@ for(ii=1:LL)
              k=Mappings(k);;
             end
             Mappings(j)=k;
+
         end
     end
 end
@@ -133,54 +132,9 @@ for(ii=1:LL)
     for(jj=1:MM)
         if(Labels(ii,jj)>0)
             Labels(ii,jj)=size_objects(Labels(ii,jj));
-        end
+        else
+            Labels(ii,jj)=0;
     end
 end
 end
 
-
-% Second iteration: additional scans
-
-% for ii = LL-1:-1:2
-%     for jj = MM-1:-1:2
-%          M = [Labels(ii,jj-1) Labels(ii,jj) Labels(ii,jj+1);
-%              Labels(ii+1,jj-1) Labels(ii+1,jj) Labels(ii+1,jj+1)];         
-%         
-%         switch nhood
-%             
-%             case 4
-%                 M_vect = [M(1,2), M(2,1)];
-%                 M_vect(M_vect == 0) = [];
-%                 
-%                 if (~isempty(M_vect))
-%                     l1 = min(M_vect);
-%                     l2 = max(M_vect);
-%                     Labels(ii,jj) = l1;
-%                     Labels(Labels == l2) = l1;
-%                 end
-%                 
-%             case 8
-%                 M_vect = [M(1,1), M(1,2), M(1,3), M(2,1)];
-%                 M_vect(M_vect == 0) = [];
-%                 
-%                 if (~isempty(M_vect))
-%                     l1 = min(M_vect);
-%                     Labels(ii,jj) = l1;
-%                     Labels(Labels == M(1,1)) = l1;
-%                     Labels(Labels == M(1,2)) = l1;
-%                     Labels(Labels == M(1,3)) = l1;
-%                     Labels(Labels == M(2,1)) = l1;
-%                 end
-%         end
-%     end
-
-
-
-        
-                    
-                    
-                    
-                    
-                    
-                    
-                
