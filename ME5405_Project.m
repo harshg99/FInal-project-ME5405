@@ -1,4 +1,3 @@
-
 % ME5405: Computer Vision Project
 
 clc;clear;close all;
@@ -22,7 +21,7 @@ charac = charac - 55.*check - 48.*notcheck;
 
 % Show both images
 figure()
-imshow(chip);
+image(chip);
 title(["Chip"]);
 
 figure()
@@ -197,7 +196,7 @@ figure();
 for ii = 1:length(Segment_charac)
     subplot(ceil((length(Segment_charac)/3)),3,ii);
     %colormap(gray(2))
-    imshow(Segment_charac{1,ii}); 
+    imshow(Segment_charac{1,ii},colormap(gray(32))); 
 end
 a=axes;
 a.Visible='off';
@@ -208,7 +207,7 @@ figure();
 for ii = 1:length(Segment_chip)
     subplot(ceil((length(Segment_chip)/3)),3,ii);
     %colormap(gray(2))
-    imshow(Segment_chip{1,ii}); 
+    imshow(Segment_chip{1,ii},colormap(gray(255))); 
 end
 a=axes;
 a.Visible='off';
@@ -249,7 +248,7 @@ h1=figure();
 for ii = 1:length(Edges_charac)
     subplot(ceil(length(Edges_charac)/3),3,ii);
     %colormap(gray(2))
-    imshow(Edges_charac{1,ii});
+    imshow(Edges_charac{1,ii},colormap(gray(2)));
 end
 a=axes;
 a.Visible='off';
@@ -261,7 +260,7 @@ h2=figure();
 for ii = 1:length(Edges_chip)
     subplot(ceil((length(Edges_chip)/3)),3,ii);
     %colormap(gray(2))
-    imshow(Edges_chip{1,ii}); 
+    imshow(Edges_chip{1,ii},colormap(gray(2))); 
 end
 a=axes;
 a.Visible='off';
@@ -292,7 +291,7 @@ h1=figure();
 for ii = 1:length(Rot_charac)
     subplot(ceil(length(Rot_charac)/3),3,ii);
     %colormap(gray(2))
-    imshow(Rot_charac{1,ii});
+    imshow(Rot_charac{1,ii},colormap(gray(32)));
 end
 a=axes;
 a.Visible='off';
@@ -304,7 +303,7 @@ h1=figure();
 for ii = 1:length(Rot_chip)
     subplot(ceil(length(Rot_chip)/3),3,ii);
     %colormap(gray(2))
-    imshow(Rot_chip{1,ii});
+    imshow(Rot_chip{1,ii},colormap(gray(255)));
 end
 a=axes;
 a.Visible='off';
@@ -328,7 +327,7 @@ h1=figure();
 for ii = 1:length(Rot_charac)
     subplot(ceil(length(Rot_charac)/3),3,ii);
     %colormap(gray(2))
-    imshow(Rot_charac{1,ii});
+    imshow(Rot_charac{1,ii},colormap(gray(32)));
 end
 a=axes;
 a.Visible='off';
@@ -340,7 +339,7 @@ h1=figure();
 for ii = 1:length(Rot_chip)
     subplot(ceil(length(Rot_chip)/3),3,ii);
     %colormap(gray(2))
-    imshow(Rot_chip{1,ii});
+    imshow(Rot_chip{1,ii},colormap(gray(255)));
 end
 a=axes;
 a.Visible='off';
@@ -377,7 +376,7 @@ h1=figure();
 for ii = 1:length(Skele_charac)
     subplot(ceil(length(Skele_charac)/3),3,ii);
     %colormap(gray(2))
-    imshow(Skele_charac{1,ii});
+    imshow(Skele_charac{1,ii},colormap(gray(2)));
 end
 a=axes;
 a.Visible='off';
@@ -389,7 +388,7 @@ h1=figure();
 for ii = 1:length(Skele_chip)
     subplot(ceil(length(Skele_chip)/3),3,ii);
     %colormap(gray(2))
-    imshow(Skele_chip{1,ii});
+    imshow(Skele_chip{1,ii},colormap(gray(2)));
 end
 a=axes;
 a.Visible='off';
