@@ -70,7 +70,15 @@ for ii = 1:size(dXX,1)
         
         switch interpol
             case "Nearest"
-                out_image(ii,jj) = image(round(pointY),round(pointX));
+                if (deta < 0.5 && deps < 0.5)
+                    out_image(ii,jj) = I1;
+                elseif (deta < 0.5 && deps >= 0.5)
+                    out_image(ii,jj) = I3;
+                elseif (deta >= 0.5 && deps < 0.5)
+                    out_image(ii,jj) = I2;
+                else 
+                    out_image(ii,jj) = I4;
+                end
             case "Average"
                 out_image(ii,jj) = mean(image_nhood(:));
             case "Bilinear"
